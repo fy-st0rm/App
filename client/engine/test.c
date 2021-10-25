@@ -24,7 +24,8 @@ int main(int argc, char** argv)
 	SDL_Color e_fg = {255, 0, 0, 0};
 	SDL_Color e_bg = {0, 0, 0, 0};
 	SDL_Color e_b = {0, 255, 255, 0};
-	Entry* entry = entry_new(window->renderer, 50, 100, 300, 50, 1024, e_fg, e_bg, e_b); 
+	SDL_Rect e_rect = {50, 100, 300, 50};
+	Entry* entry = entry_new(window->renderer, font, e_rect, 1024, e_fg, e_bg, e_b); 
 
 	// Frame stuff
 	int fps = 60;
@@ -46,10 +47,8 @@ int main(int argc, char** argv)
 			{
 				loop = false;
 			}
-			else if (event.type == SDL_KEYDOWN)
-			{
-				entry_insert(entry, "Helo!");
-			}
+			entry_event(entry, event);
+			
 		}
 		
 		// Rendering
