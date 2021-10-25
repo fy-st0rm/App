@@ -7,7 +7,7 @@ S_OBJ = $(S_DIR)/server.o
 S_OUT = $(S_DIR)/server
 S_LIB = -lpthread
 
-server:
+sv:
 	$(MAKE) sv_build
 	$(MAKE) sv_clean
 
@@ -25,7 +25,7 @@ E_OBJ_DIR = $(E_DIR)/obj
 E_SRC = $(E_DIR)/*.c
 
 
-engine:
+eng:
 	$(MAKE) eng_build
 
 
@@ -45,7 +45,7 @@ C_OBJ = $(C_OBJ_DIR)/*.o
 C_LIB = -lSDL2main -lSDL2 -lSDL2_ttf
 C_OUT = $(C_DIR)/client
 
-client:
+cli:
 	$(MAKE) client_build
 
 client_build:
