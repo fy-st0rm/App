@@ -1,4 +1,4 @@
-// Std's utils
+// Std's includes
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -6,7 +6,7 @@
 
 #include <pthread.h>
 
-// Socket imports
+// Socket includes
 #include <sys/socket.h>
 #include <netinet/in.h>
 
