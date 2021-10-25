@@ -10,21 +10,23 @@ Entry* entry_new(SDL_Renderer* renderer, TTF_Font* font, SDL_Rect rect, int max_
 	Entry* entry = malloc(sizeof(Entry));
 	entry->rect = rect;
 	
+	// Setting up the buffer
+	entry->input_pos = 5;
+	entry->scroll_x = 0;
+	entry->max_input = max_input;
+	entry->input = calloc(max_input, sizeof(char));
+
 	// Setting up the cursor
 	SDL_Texture* cursor_texture = create_texture(renderer, font, "A");
 	SDL_QueryTexture(cursor_texture, NULL, NULL, &entry->cursor.w, &entry->cursor.h);
 	SDL_DestroyTexture(cursor_texture);
-	entry->cursor.x = 5;
+	entry->cursor.x = entry->input_pos;
 	entry->cursor.y = rect.h / 2 - entry->cursor.h / 2;
 		
 	// Setting up the colors
 	entry->fg = fg;
 	entry->bg = bg;
 	entry->border = border;
-
-	// Setting up the buffer
-	entry->max_input = max_input;
-	entry->input = calloc(max_input, sizeof(char));
 
 	entry->texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, rect.w, rect.h);
 
@@ -55,12 +57,14 @@ void entry_render(Entry* entry, SDL_Renderer* renderer, TTF_Font* font)
 	SDL_Texture* texture = create_texture(renderer, font, entry->input);
 	SDL_Rect text_rect;
 	SDL_QueryTexture(texture, NULL, NULL, &text_rect.w, &text_rect.h);
-	draw_text(renderer, 5, entry->rect.h / 2 - text_rect.h / 2, texture, entry->fg);
+	draw_text(renderer, entry->input_pos - (entry->scroll_x * entry->cursor.w), entry->rect.h / 2 - text_rect.h / 2, texture, entry->fg);
 	SDL_DestroyTexture(texture);	
 
 	// Drawing the cursor
 	SDL_SetRenderDrawColor(renderer, entry->border.r, entry->border.g, entry->border.b, entry->border.a);
-	SDL_RenderFillRect(renderer, &entry->cursor);
+	SDL_Rect temp_rect = entry->cursor;
+	temp_rect.x -= entry->scroll_x * entry->cursor.w;
+	SDL_RenderFillRect(renderer, &temp_rect);
 		
 	// Drawing the target texture
 	SDL_SetRenderTarget(renderer, NULL);
@@ -69,43 +73,56 @@ void entry_render(Entry* entry, SDL_Renderer* renderer, TTF_Font* font)
 
 void entry_insert(Entry* entry, char* text)
 {
-	// Cursor movement
-	if (text == "left")		// Cursor left
+	// Scroll control
+	if ((entry->cursor.x + entry->cursor.w) - (entry->scroll_x * entry->cursor.w) > entry->rect.w)
 	{
-		if (entry->cursor.x > 5)
+		int diff = entry->cursor.x + entry->cursor.w - (entry->scroll_x * entry->cursor.w) - entry->rect.w;
+		entry->scroll_x += diff;
+	}
+	else if (entry->cursor.x - (entry->scroll_x * entry->cursor.w) < 5)
+	{
+		if (entry->scroll_x > 0)
+		{
+			int diff = 5 - (entry->cursor.x - (entry->scroll_x * entry->cursor.w));
+			entry->scroll_x -= diff;
+			if (entry->scroll_x < 0) entry->scroll_x = 0;
+		}
+	}
+
+	// Cursor movement
+	if (text == "left")	
+	{
+		if ((entry->cursor.x) > entry->input_pos)
 			entry->cursor.x -= entry->cursor.w;
 	}
-	else if (text == "right")	// Cursor right
+	else if (text == "right")
 	{
-		if (entry->cursor.x / entry->cursor.w < strlen(entry->input))
+		if ((entry->cursor.x) / entry->cursor.w < strlen(entry->input))
 			entry->cursor.x += entry->cursor.w;
 	}
 	
 	// Backspace and delete key handler
-	else if (text == "backspace")	// Backspace
+	else if (text == "backspace")
 	{
-		if ((entry->cursor.x / entry->cursor.w > 0) && (strlen(entry->input) > 0))
+		if ((entry->cursor.x/ entry->cursor.w > 0) && (strlen(entry->input) > 0))
 		{
 			int index = entry->cursor.x / entry->cursor.w - 1;
 			memmove(&entry->input[index], &entry->input[index + 1], strlen(entry->input) - index);
 			entry->cursor.x -= entry->cursor.w;
 		}
 	}
-	else if (text == "delete")	// Delete
+	else if (text == "delete")
 	{
 		if ((entry->cursor.x / entry->cursor.w >= 0) && (strlen(entry->input) > 0) && (entry->cursor.x / entry->cursor.w != strlen(entry->input)))
 		{
 			int index = entry->cursor.x / entry->cursor.w;
 			memmove(&entry->input[index], &entry->input[index + 1], strlen(entry->input) - index);
 		}
-
 	}
 
 	// To insert character into input buffer
 	else if (entry->cursor.x < entry->max_input)
-	{
-		printf("%d %d\n", entry->cursor.x/entry->cursor.w, strlen(entry->input));
-		
+	{	
 		// When cursor is at the end
 		if (entry->cursor.x / entry->cursor.w >= strlen(entry->input))
 		{
@@ -118,7 +135,7 @@ void entry_insert(Entry* entry, char* text)
 		{
 			char* new_input = calloc(entry->max_input, sizeof(char));
 			int index = entry->cursor.x / entry->cursor.w;
-		
+			
 			// Copying the old input into new one with the inputed text
 			memcpy(new_input, entry->input, index);
 			strcpy(new_input + index, text);
@@ -127,9 +144,8 @@ void entry_insert(Entry* entry, char* text)
 			// Chaning the pointer to the input
 			free(entry->input);
 			entry->input = new_input;
-			entry->cursor.x += strlen(text) * entry->cursor.w;
+			entry->cursor.x += (strlen(text)) * entry->cursor.w;
 		}
-
 	}
 }
 
@@ -155,6 +171,12 @@ void entry_event(Entry* entry, SDL_Event event)
 				break;
 			case SDLK_DELETE:
 				entry_insert(entry, "delete");
+				break;
+			case SDLK_UP:
+				entry->scroll_x += 1;
+				break;
+			case SDLK_DOWN:
+				entry->scroll_x -= 1;
 				break;
 		}
 	}

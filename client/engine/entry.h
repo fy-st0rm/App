@@ -15,6 +15,10 @@ typedef struct Entry
 
 	char* input;						// Input buffer
 	int max_input;						// Max input size
+
+	int input_pos;
+	int scroll_x;
+
 } Entry;
 
 

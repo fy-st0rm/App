@@ -15,16 +15,11 @@ int main(int argc, char** argv)
 	if (!font)
 		return -1;
 
-	// Text test
-	char* text = "Helo World!";
-	SDL_Color fg = {255, 255, 0, 255};
-	SDL_Texture* texture = create_texture(window->renderer, font, text);
-
 	// Entry test
-	SDL_Color e_fg = {255, 0, 0, 0};
+	SDL_Color e_fg = {255, 255, 255, 0};
 	SDL_Color e_bg = {0, 0, 0, 0};
-	SDL_Color e_b = {0, 255, 255, 0};
-	SDL_Rect e_rect = {50, 100, 300, 50};
+	SDL_Color e_b = {0, 165, 165, 0};
+	SDL_Rect e_rect = {100, 100, 300, 50};
 	Entry* entry = entry_new(window->renderer, font, e_rect, 1024, e_fg, e_bg, e_b); 
 
 	// Frame stuff
@@ -52,7 +47,6 @@ int main(int argc, char** argv)
 		}
 		
 		// Rendering
-		draw_text(window->renderer, 1, 1, texture, fg); 
 		entry_render(entry, window->renderer, font);
 
 		// capping the frame rate to 60
