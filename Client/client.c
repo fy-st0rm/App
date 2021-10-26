@@ -8,12 +8,14 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
-#define PORT 8080
+#include "config.h"
+#include "Engine/engine.h"
+#include "home.h"
 
+int connect_sv();
 
-int main(int argc, char** argv)
+int connect_sv()
 {
-	int server = 0;
 	struct sockaddr_in sv_addr;
 
 	if ((server = socket(AF_INET, SOCK_STREAM, 0)) == 0)
@@ -25,7 +27,7 @@ int main(int argc, char** argv)
 	sv_addr.sin_family = AF_INET;
 	sv_addr.sin_port = htons(PORT);
 
-	inet_pton(AF_INET, "127.0.0.1", &sv_addr.sin_addr);
+	inet_pton(AF_INET, ip, &sv_addr.sin_addr);
 
 	// Trying to connect to the server
 	if (connect(server, (struct sockaddr*) &sv_addr, sizeof(sv_addr)) < 0)
@@ -33,14 +35,30 @@ int main(int argc, char** argv)
 		fprintf(stderr, "Failed to connect!"); 
 		return -1;	//TODO: display some error popup
 	}
+}
 
-	char buffer[1024] = {0};
-	read(server, buffer, sizeof(buffer));
-	printf("Server: %s\n", buffer);
+int main(int argc, char** argv)
+{
+	/*
+	if (connect_sv() < 0)
+		return -1;
+	*/
+	atexit(report_mem_leak);
+	if (engine_init() < 0) return -1;
+	
+	Window* window = window_new("App", 800, 600, SDL_WINDOW_RESIZABLE);
+	SDL_MaximizeWindow(window->window);
 
-	char* msg = "Helo!";
-	send(server, msg, strlen(msg), 0);
+	TTF_Font* font = TTF_OpenFont(font_path, font_size);
+	if (!font) return -1;
 
+	// Starting home page
+	HomePage* home_page = home_page_new(window, font);
+	home_page_run(home_page);
+	home_page_close(home_page);
+
+	window_destroy(window);
+	engine_quit();
 	return 0;
 }
 

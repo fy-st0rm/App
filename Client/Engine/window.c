@@ -5,10 +5,10 @@
 #include "leak_detector_c.h"
 
 
-Window* window_new(char* title, int w, int h)
+Window* window_new(char* title, int w, int h, int flag)
 {
 	Window* window = malloc(sizeof(Window));
-	window->window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, 0);
+	window->window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, flag);
 	window->renderer = SDL_CreateRenderer(window->window, -1, SDL_RENDERER_ACCELERATED);
 	window->w = w;
 	window->h = h;	

@@ -40,3 +40,8 @@ void menu_render_end(Menu* menu, SDL_Renderer* renderer)
 	SDL_RenderCopy(renderer, menu->texture, NULL, &menu->rect);
 }
 
+void menu_update_rect(Menu* menu, SDL_Rect rect)
+{
+	menu->rect = rect;
+}
+

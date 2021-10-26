@@ -9,6 +9,7 @@ Entry* entry_new(SDL_Renderer* renderer, TTF_Font* font, SDL_Rect rect, int max_
 	// Constructor	
 	Entry* entry = malloc(sizeof(Entry));
 	entry->rect = rect;
+	entry->active = true;
 	
 	// Setting up the buffer
 	entry->input_pos = 5;
@@ -28,6 +29,7 @@ Entry* entry_new(SDL_Renderer* renderer, TTF_Font* font, SDL_Rect rect, int max_
 	entry->fg = fg;
 	entry->bg = bg;
 	entry->border = border;
+	entry->cursor_color = border;
 
 	entry->texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, rect.w, rect.h);
 
@@ -66,11 +68,17 @@ void entry_render(Entry* entry, SDL_Renderer* renderer, SDL_Texture* surface, TT
 	SDL_DestroyTexture(texture);	
 
 	// Drawing the cursor
-	SDL_SetRenderDrawColor(renderer, entry->border.r, entry->border.g, entry->border.b, entry->border.a);
+	SDL_SetRenderDrawColor(renderer, entry->cursor_color.r, entry->cursor_color.g, entry->cursor_color.b, entry->cursor_color.a);
 	SDL_Rect temp_rect = entry->cursor;
 	temp_rect.x -= entry->scroll_x * entry->cursor.w;
+	
 	SDL_RenderFillRect(renderer, &temp_rect);
-		
+	if (!entry->active)	
+	{
+		SDL_Rect inside_rect = { temp_rect.x + 2, temp_rect.y + 2, temp_rect.w - 4, temp_rect.h - 4};
+		SDL_SetRenderDrawColor(renderer, entry->bg.r, entry->bg.g, entry->bg.b, entry->bg.a);
+		SDL_RenderFillRect(renderer, &inside_rect);	
+	}
 	// Drawing the target texture
 	SDL_SetRenderTarget(renderer, surface);
 	SDL_RenderCopy(renderer, entry->texture, NULL, &entry->rect);
@@ -157,47 +165,70 @@ void entry_insert(Entry* entry, char* text)
 
 void entry_event(Entry* entry, SDL_Event event)
 {
-	if (event.type == SDL_TEXTINPUT)
+	if (entry->active)
 	{
-		entry_insert(entry, event.text.text);
-	}
-	
-	if (event.type == SDL_KEYDOWN)
-	{
-		switch (event.key.keysym.sym)
+		if (event.type == SDL_TEXTINPUT)
 		{
-			case SDLK_LEFT:
-				entry_insert(entry, "left");
-				break;
-			case SDLK_RIGHT:
-				entry_insert(entry, "right");
-				break;	
-			case SDLK_BACKSPACE:
-				entry_insert(entry, "backspace");
-				break;
-			case SDLK_DELETE:
-				entry_insert(entry, "delete");
-				break;
-			case SDLK_UP:
-				entry->scroll_x += 1;
-				break;
-			case SDLK_DOWN:
-				entry->scroll_x -= 1;
-				break;
+			entry_insert(entry, event.text.text);
+		}
+		
+		if (event.type == SDL_KEYDOWN)
+		{
+			switch (event.key.keysym.sym)
+			{
+				case SDLK_LEFT:
+					entry_insert(entry, "left");
+					break;
+				case SDLK_RIGHT:
+					entry_insert(entry, "right");
+					break;	
+				case SDLK_BACKSPACE:
+					entry_insert(entry, "backspace");
+					break;
+				case SDLK_DELETE:
+					entry_insert(entry, "delete");
+					break;
+				case SDLK_UP:
+					entry->scroll_x += 1;
+					break;
+				case SDLK_DOWN:
+					entry->scroll_x -= 1;
+					break;
+			}
 		}
 	}
 }
 
 char* entry_get(Entry* entry)
 {
-	return entry->input;
+	if (entry->active)
+		return entry->input;
+	return "";
 }
 
 void entry_clear(Entry* entry)
 {
-	free(entry->input);
-	entry->input = calloc(entry->max_input, sizeof(char));
-	entry->cursor.x = entry->input_pos;
-	entry->scroll_x = 0;
+	if  (entry->active)
+	{
+		free(entry->input);
+		entry->input = calloc(entry->max_input, sizeof(char));
+		entry->cursor.x = entry->input_pos;
+		entry->scroll_x = 0;
+	}
+}
+
+void entry_set_focus(Entry* entry)
+{
+	entry->active = true;
+}
+
+void entry_remove_focus(Entry* entry)
+{
+	entry->active = false;
+}
+
+void entry_set_cursor_color(Entry* entry, SDL_Color color)
+{
+	entry->cursor_color = color;
 }
 

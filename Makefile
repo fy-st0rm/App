@@ -49,12 +49,16 @@ C_OUT = $(C_DIR)/client
 
 cli:
 	$(MAKE) client_build
+	$(MAKE) client_run
 
 client_build:
 	$(CC) -I$(INC) -c $(C_SRC)
 	mv *.o $(C_OBJ_DIR)/
 	cp $(E_OBJ_DIR)/*.o $(C_OBJ_DIR)/
 	$(CC) -o $(C_OUT) $(C_OBJ) $(C_LIB)
+
+client_run:
+	./$(C_OUT)
 
 client_clean:
 	rm $(C_OBJ_DIR)/*.o

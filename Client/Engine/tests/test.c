@@ -25,8 +25,15 @@ int main(int argc, char** argv)
 	// Menu test
 	SDL_Color m_bg = {165, 0, 165, 0};
 	SDL_Color m_b = {0, 165, 165, 0};
-	SDL_Rect m_rect = {100, 200, 500, 300};
+	SDL_Rect m_rect = {100, 300, 500, 300};
 	Menu* menu = menu_new(window->renderer, m_rect, m_bg, m_b);
+
+	// Button test
+	SDL_Color b_bg = {255, 255, 255, 255};
+	SDL_Color b_fg = {0, 0, 0, 255};
+	SDL_Color b_b = {0, 0, 0, 255};
+	SDL_Rect b_rect = {100, 50, 100, 50};
+	Button* button = button_new(window->renderer, b_rect, font, "helo",  b_fg, b_bg, b_b);
 
 	// Frame stuff
 	int fps = 60;
@@ -51,17 +58,40 @@ int main(int argc, char** argv)
 			entry_event(entry, event);
 			if (event.type == SDL_KEYDOWN)
 			{
-				if (event.key.keysym.sym == SDLK_RETURN)
+				switch (event.key.keysym.sym)
 				{
-					char* output = entry_get(entry);
-					printf("%s\n", output);
-					entry_clear(entry);
+					case SDLK_RETURN:
+					{
+						char* output = entry_get(entry);
+						if (output != "")
+							printf("%s\n", output);
+						entry_clear(entry);
+						break;
+					}
+					case SDLK_ESCAPE:
+					{
+						entry_remove_focus(entry);
+						break;
+					}
+					case SDLK_TAB:
+					{
+						entry_set_focus(entry);
+						break;
+					}
 				}
-			}	
+
+			}
+
+			if (button_is_clicked(button, event))
+			{
+				printf("Clicked\n");
+			}
+				
 		}
 		
 		// Rendering
 
+		button_render(button,  window->renderer);
 		menu_render_begin(menu, window->renderer);
 		entry_render(entry, window->renderer, menu->texture, font);
 		menu_render_end(menu, window->renderer);
@@ -74,6 +104,7 @@ int main(int argc, char** argv)
 		}
 	}
 	
+	button_destroy(button);
 	entry_destroy(entry);
 	menu_destroy(menu);
 	window_destroy(window);

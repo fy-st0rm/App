@@ -8,8 +8,10 @@
 #include "text.h"
 #include "entry.h"
 #include "menu.h"
+#include "button.h"
+#include "leak_detector_c.h"
 
-int engine_init()
+static int engine_init()
 {
 	if (SDL_Init(SDL_INIT_VIDEO) != 0)
 		return -1;
@@ -20,7 +22,7 @@ int engine_init()
 	return 0;
 }
 
-void engine_quit()
+static void engine_quit()
 {
 	SDL_Quit();
 	TTF_Quit();

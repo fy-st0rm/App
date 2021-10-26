@@ -4,6 +4,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 typedef struct Entry
 {
@@ -11,14 +12,14 @@ typedef struct Entry
 	SDL_Texture* texture;				// Surface
 	
 	SDL_Rect cursor;
-	SDL_Color fg, bg, border;			// Colors
+	SDL_Color fg, bg, border, cursor_color;			// Colors
 
 	char* input;						// Input buffer
 	int max_input;						// Max input size
 
 	int input_pos;
 	int scroll_x;
-
+	bool active;
 } Entry;
 
 
@@ -29,5 +30,9 @@ void entry_insert(Entry* entry, char* text);
 void entry_event(Entry* entry, SDL_Event event);
 char* entry_get(Entry* entry);
 void entry_clear(Entry* entry);
+void entry_set_focus(Entry* entry);
+void entry_remove_focus(Entry* entry);
+
+void entry_set_cursor_color(Entry* entry, SDL_Color color);
 
 #endif
