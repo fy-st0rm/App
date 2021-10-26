@@ -42,7 +42,7 @@ void entry_destroy(Entry* entry)
 	free(entry);
 }
 
-void entry_render(Entry* entry, SDL_Renderer* renderer, TTF_Font* font)
+void entry_render(Entry* entry, SDL_Renderer* renderer, SDL_Texture* surface, TTF_Font* font)
 {
 	// Drawing border
 	SDL_Rect rect = {entry->rect.x - 2, entry->rect.y - 2, entry->rect.w + 4, entry->rect.h + 4};
@@ -72,7 +72,7 @@ void entry_render(Entry* entry, SDL_Renderer* renderer, TTF_Font* font)
 	SDL_RenderFillRect(renderer, &temp_rect);
 		
 	// Drawing the target texture
-	SDL_SetRenderTarget(renderer, NULL);
+	SDL_SetRenderTarget(renderer, surface);
 	SDL_RenderCopy(renderer, entry->texture, NULL, &entry->rect);
 }
 

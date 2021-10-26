@@ -7,6 +7,7 @@
 #include "window.h"
 #include "text.h"
 #include "entry.h"
+#include "menu.h"
 
 int engine_init()
 {

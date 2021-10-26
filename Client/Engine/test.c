@@ -6,7 +6,7 @@ int main(int argc, char** argv)
 	atexit(report_mem_leak);
 	if (engine_init() < 0) return -1;
 
-	Window* window = window_new("Helo", 500, 500);
+	Window* window = window_new("Helo", 800, 600);
 	
 	// Font
 	const char* font_path = "/usr/share/fonts/TTF/Terminess (TTF) Nerd Font Complete.ttf";
@@ -21,6 +21,12 @@ int main(int argc, char** argv)
 	SDL_Color e_b = {0, 165, 165, 0};
 	SDL_Rect e_rect = {100, 100, 300, 50};
 	Entry* entry = entry_new(window->renderer, font, e_rect, 1024, e_fg, e_bg, e_b); 
+
+	// Menu test
+	SDL_Color m_bg = {165, 0, 165, 0};
+	SDL_Color m_b = {0, 165, 165, 0};
+	SDL_Rect m_rect = {100, 200, 500, 300};
+	Menu* menu = menu_new(window->renderer, m_rect, m_bg, m_b);
 
 	// Frame stuff
 	int fps = 60;
@@ -55,7 +61,10 @@ int main(int argc, char** argv)
 		}
 		
 		// Rendering
-		entry_render(entry, window->renderer, font);
+
+		menu_render_begin(menu, window->renderer);
+		entry_render(entry, window->renderer, menu->texture, font);
+		menu_render_end(menu, window->renderer);
 
 		// capping the frame rate to 60
 		frame_time = SDL_GetTicks() - frame_start;
@@ -66,6 +75,7 @@ int main(int argc, char** argv)
 	}
 	
 	entry_destroy(entry);
+	menu_destroy(menu);
 	window_destroy(window);
 	engine_quit();	
 
