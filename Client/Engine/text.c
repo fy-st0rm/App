@@ -1,4 +1,5 @@
 #include "text.h"
+#include "leak_detector_c.h"
 
 SDL_Texture* create_texture(SDL_Renderer* renderer, TTF_Font* font, char* text)
 {

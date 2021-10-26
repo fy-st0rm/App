@@ -1,7 +1,8 @@
 CC = gcc
+INC = ../../vendor/
 LIB = -lSDL2main -lSDL2 -lSDL2_ttf
 
-SRC = *.c
+SRC = *.c $(INC)*.c
 OBJ = *.o
 OUT = test
 
@@ -11,7 +12,7 @@ all:
 	$(MAKE) run
 
 build:
-	$(CC) -c $(SRC)
+	$(CC) -I$(INC) -c $(SRC)
 	$(CC) -o $(OUT) $(OBJ) $(LIB)
 
 clean:

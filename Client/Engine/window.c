@@ -1,7 +1,9 @@
-#include "window.h"
-
 #include <stdlib.h>
 #include <stdio.h>
+
+#include "window.h"
+#include "leak_detector_c.h"
+
 
 Window* window_new(char* title, int w, int h)
 {
@@ -25,4 +27,5 @@ void window_destroy(Window* window)
 {
 	SDL_DestroyWindow(window->window);
 	SDL_DestroyRenderer(window->renderer);
+	free(window);
 }

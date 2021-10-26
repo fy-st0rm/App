@@ -1,9 +1,9 @@
 #include "engine.h"
-
-
+#include "leak_detector_c.h"
 
 int main(int argc, char** argv)
 {
+	atexit(report_mem_leak);
 	if (engine_init() < 0) return -1;
 
 	Window* window = window_new("Helo", 500, 500);
@@ -43,7 +43,15 @@ int main(int argc, char** argv)
 				loop = false;
 			}
 			entry_event(entry, event);
-			
+			if (event.type == SDL_KEYDOWN)
+			{
+				if (event.key.keysym.sym == SDLK_RETURN)
+				{
+					char* output = entry_get(entry);
+					printf("%s\n", output);
+					entry_clear(entry);
+				}
+			}	
 		}
 		
 		// Rendering
@@ -57,7 +65,9 @@ int main(int argc, char** argv)
 		}
 	}
 	
+	entry_destroy(entry);
 	window_destroy(window);
 	engine_quit();	
+
 	return 0;
 }

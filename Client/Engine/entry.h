@@ -27,5 +27,7 @@ void entry_render(Entry* entry, SDL_Renderer* renderer, TTF_Font* font);
 void entry_destroy(Entry* entry);
 void entry_insert(Entry* entry, char* text);
 void entry_event(Entry* entry, SDL_Event event);
+char* entry_get(Entry* entry);
+void entry_clear(Entry* entry);
 
 #endif

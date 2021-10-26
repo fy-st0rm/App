@@ -2,7 +2,7 @@
 
 #include "entry.h"
 #include "text.h"
-
+#include "leak_detector_c.h"
 
 Entry* entry_new(SDL_Renderer* renderer, TTF_Font* font, SDL_Rect rect, int max_input, SDL_Color fg, SDL_Color bg, SDL_Color border)
 {
@@ -121,7 +121,7 @@ void entry_insert(Entry* entry, char* text)
 	}
 
 	// To insert character into input buffer
-	else if (entry->cursor.x < entry->max_input)
+	else if (entry->cursor.x / entry->cursor.w < entry->max_input)
 	{	
 		// When cursor is at the end
 		if (entry->cursor.x / entry->cursor.w >= strlen(entry->input))
@@ -182,4 +182,16 @@ void entry_event(Entry* entry, SDL_Event event)
 	}
 }
 
+char* entry_get(Entry* entry)
+{
+	return entry->input;
+}
+
+void entry_clear(Entry* entry)
+{
+	free(entry->input);
+	entry->input = calloc(entry->max_input, sizeof(char));
+	entry->cursor.x = entry->input_pos;
+	entry->scroll_x = 0;
+}
 

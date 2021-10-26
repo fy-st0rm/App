@@ -9,7 +9,7 @@
 // Socket includes
 #include <sys/socket.h>
 #include <netinet/in.h>
-
+#include "leak_detector_c.h"
 #define PORT 8080
 
 // Global vars
