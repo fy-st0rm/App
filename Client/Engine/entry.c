@@ -20,9 +20,10 @@ Entry* entry_new(SDL_Renderer* renderer, TTF_Font* font, SDL_Rect rect, int max_
 	SDL_Texture* cursor_texture = create_texture(renderer, font, "A");
 	SDL_QueryTexture(cursor_texture, NULL, NULL, &entry->cursor.w, &entry->cursor.h);
 	SDL_DestroyTexture(cursor_texture);
+
 	entry->cursor.x = entry->input_pos;
 	entry->cursor.y = rect.h / 2 - entry->cursor.h / 2;
-		
+
 	// Setting up the colors
 	entry->fg = fg;
 	entry->bg = bg;
@@ -54,10 +55,14 @@ void entry_render(Entry* entry, SDL_Renderer* renderer, TTF_Font* font)
 	SDL_RenderClear(renderer);
 	
 	// Drawing the text
-	SDL_Texture* texture = create_texture(renderer, font, entry->input);
+	int entry_size = entry->rect.w / entry->cursor.w;
+	char input[entry_size];
+	memcpy(input, entry->input + entry->scroll_x, entry_size);
+	
+	SDL_Texture* texture = create_texture(renderer, font, input);
 	SDL_Rect text_rect;
 	SDL_QueryTexture(texture, NULL, NULL, &text_rect.w, &text_rect.h);
-	draw_text(renderer, entry->input_pos - (entry->scroll_x * entry->cursor.w), entry->rect.h / 2 - text_rect.h / 2, texture, entry->fg);
+	draw_text(renderer, entry->input_pos, entry->rect.h / 2 - text_rect.h / 2, texture, entry->fg);
 	SDL_DestroyTexture(texture);	
 
 	// Drawing the cursor
@@ -73,10 +78,11 @@ void entry_render(Entry* entry, SDL_Renderer* renderer, TTF_Font* font)
 
 void entry_insert(Entry* entry, char* text)
 {
+	//TODO: Calculate a better way for scrolling
 	// Scroll control
 	if ((entry->cursor.x + entry->cursor.w) - (entry->scroll_x * entry->cursor.w) > entry->rect.w)
 	{
-		int diff = entry->cursor.x + entry->cursor.w - (entry->scroll_x * entry->cursor.w) - entry->rect.w;
+		int diff = entry->cursor.x + entry->cursor.w - (entry->scroll_x * entry->cursor.w) - (entry->rect.w);
 		entry->scroll_x += diff;
 	}
 	else if (entry->cursor.x - (entry->scroll_x * entry->cursor.w) < 5)
@@ -126,7 +132,7 @@ void entry_insert(Entry* entry, char* text)
 		// When cursor is at the end
 		if (entry->cursor.x / entry->cursor.w >= strlen(entry->input))
 		{
-			strcpy(entry->input + (entry->cursor.x / entry->cursor.w), text);
+			memcpy(entry->input + (entry->cursor.x / entry->cursor.w), text, sizeof(text));
 			entry->cursor.x += strlen(text) * entry->cursor.w;
 		}
 
