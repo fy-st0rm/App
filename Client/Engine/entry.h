@@ -28,6 +28,7 @@ void entry_render(Entry* entry, SDL_Renderer* renderer, SDL_Texture* surface, TT
 void entry_destroy(Entry* entry);
 void entry_insert(Entry* entry, char* text);
 void entry_event(Entry* entry, SDL_Event event);
+void entry_mouse_event(Entry* entry, SDL_Event event, int offset_x, int offset_y);
 char* entry_get(Entry* entry);
 void entry_clear(Entry* entry);
 void entry_set_focus(Entry* entry);

@@ -32,14 +32,20 @@ typedef struct HomePage
 
 	Entry* password_entry;
 	SDL_Rect password_rect;
+
+	Button* create_button;
+	SDL_Rect create_button_rect;
+
+	Button* mode_button;
+	SDL_Rect mode_button_rect;
 } HomePage;
 
 HomePage* home_page_new(Window* window, TTF_Font* font);
 void home_page_run				(HomePage* home_page);
 void home_page_close			(HomePage* home_page);
+void home_page_resize_widgets	(HomePage* home_page);
 void home_page_update_widgets	(HomePage* home_page);
 void home_page_username			(HomePage* home_page);
 void home_page_password			(HomePage* home_page);
-void home_page_handle_focus		(HomePage* home_page);
 
 #endif

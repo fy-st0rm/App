@@ -199,6 +199,20 @@ void entry_event(Entry* entry, SDL_Event event)
 	}
 }
 
+void entry_mouse_event(Entry* entry, SDL_Event event, int offset_x, int offset_y)
+{
+	if (event.type == SDL_MOUSEBUTTONDOWN)
+	{
+		SDL_Point pos;
+		SDL_GetMouseState(&pos.x, &pos.y);
+		SDL_Rect rect = { entry->rect.x + offset_x, entry->rect.y + offset_y, entry->rect.w, entry->rect.h };
+		if (SDL_PointInRect(&pos, &rect))
+			entry->active = true;
+		else
+			entry->active = false;
+	}
+}
+
 char* entry_get(Entry* entry)
 {
 	if (entry->active)
@@ -208,13 +222,10 @@ char* entry_get(Entry* entry)
 
 void entry_clear(Entry* entry)
 {
-	if  (entry->active)
-	{
-		free(entry->input);
-		entry->input = calloc(entry->max_input, sizeof(char));
-		entry->cursor.x = entry->input_pos;
-		entry->scroll_x = 0;
-	}
+	free(entry->input);
+	entry->input = calloc(entry->max_input, sizeof(char));
+	entry->cursor.x = entry->input_pos;
+	entry->scroll_x = 0;
 }
 
 void entry_set_focus(Entry* entry)
