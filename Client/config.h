@@ -18,7 +18,8 @@ static SDL_Color green		= { 133, 153, 	0 };
 static SDL_Color gray		= {  88, 110, 117 };
 
 // UI stuff
-static char* font_path = "/usr/share/fonts/TTF/Terminess (TTF) Nerd Font Complete.ttf";
+//static char* font_path = "/usr/share/fonts/TTF/Terminess (TTF) Nerd Font Complete.ttf";
+static char* font_path = "Client/assets/Terminess (TTF) Nerd Font Complete Mono.ttf";
 static int font_size = 25;
 
 #endif
