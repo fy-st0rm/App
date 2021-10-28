@@ -9,6 +9,7 @@
 #include "entry.h"
 #include "menu.h"
 #include "button.h"
+#include "notify.h"
 #include "leak_detector_c.h"
 
 static int engine_init()
@@ -24,6 +25,7 @@ static int engine_init()
 
 static void engine_quit()
 {
+	free(notifications);
 	SDL_Quit();
 	TTF_Quit();
 }

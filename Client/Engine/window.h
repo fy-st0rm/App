@@ -14,7 +14,7 @@ typedef struct Window
 
 // Window functions
 Window* window_new(char* title, int w, int h, int flag);
-void window_clear(Window* window, int r, int g, int b, int a);
+void window_clear(Window* window, SDL_Color color);
 void window_destroy(Window* window);
 
 #endif

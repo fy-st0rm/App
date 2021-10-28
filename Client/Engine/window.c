@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 #include "window.h"
+#include "notify.h"
 #include "leak_detector_c.h"
 
 
@@ -16,11 +17,14 @@ Window* window_new(char* title, int w, int h, int flag)
 	return window;
 }
 
-void window_clear(Window* window, int r, int g, int b, int a)
+void window_clear(Window* window, SDL_Color color)
 {
 	SDL_RenderPresent(window->renderer);
-	SDL_SetRenderDrawColor(window->renderer, r, g, b, a);
+	SDL_SetRenderDrawColor(window->renderer, color.r, color.g, color.b, color.a);
 	SDL_RenderClear(window->renderer);
+
+	// Drawing notifications
+	notify_draw(window->renderer);	
 }
 
 void window_destroy(Window* window)

@@ -115,14 +115,12 @@ void home_page_run(HomePage* home_page)
 	while (home_page->loop)
 	{
 		frame_start = SDL_GetTicks();
-		window_clear(home_page->window, 0, 0, 0, 0);
+		window_clear(home_page->window, sec_bg);
 
 		// Event loop
 		if (SDL_PollEvent(&home_page->event))
 		{
-			if (home_page->event.type == SDL_QUIT)
-				home_page->loop = false;
-			
+			if (home_page->event.type == SDL_QUIT) home_page->loop = false;
 			else if (home_page->event.type == SDL_WINDOWEVENT)
 			{
 				switch (home_page->event.window.event)
@@ -144,6 +142,8 @@ void home_page_run(HomePage* home_page)
 			entry_mouse_event(home_page->password_entry, home_page->event, home_page->menu_rect.x, home_page->menu_rect.y);
 	
 			// Buttons event
+			
+			// Buttons to change the mode type of the page
 			if (button_is_clicked(home_page->mode_button, home_page->event, home_page->menu_rect.x, home_page->menu_rect.y))
 			{
 				if (home_page->page == "LOGIN")
@@ -165,6 +165,20 @@ void home_page_run(HomePage* home_page)
 					entry_set_focus(home_page->username_entry);
 				}
 			}
+			
+			// Button event to create or login in account
+			if (button_is_clicked(home_page->create_button, home_page->event, home_page->menu_rect.x, home_page->menu_rect.y))
+			{
+				if (home_page->page == "LOGIN")
+				{
+					notify_send(home_page->window, home_page->font, "Account not found!", 5, main_fg, red);
+				}
+				else
+				{
+					notify_send(home_page->window, home_page->font, "Account created!", 5, main_fg, green);
+				}
+			}
+			
 		}
 		
 		// Updating buttons
@@ -191,7 +205,7 @@ void home_page_run(HomePage* home_page)
 		frame_time = SDL_GetTicks() - frame_start;
 		if (frame_delay > frame_time)
 		{
-			SDL_Delay(frame_delay - frame_time);
+			SDL_Delay(frame_delay - frame_time);		
 		}
 	}
 }

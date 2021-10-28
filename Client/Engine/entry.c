@@ -188,12 +188,6 @@ void entry_event(Entry* entry, SDL_Event event)
 				case SDLK_DELETE:
 					entry_insert(entry, "delete");
 					break;
-				case SDLK_UP:
-					entry->scroll_x += 1;
-					break;
-				case SDLK_DOWN:
-					entry->scroll_x -= 1;
-					break;
 			}
 		}
 	}

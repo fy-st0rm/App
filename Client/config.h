@@ -11,7 +11,9 @@ static int server = 0;
 
 // Colors
 static SDL_Color main_bg 	= {   0,  43,  54 };
+static SDL_Color sec_bg		= {   7,  54,  66 };
 static SDL_Color main_fg 	= { 238, 232, 213 };
+static SDL_Color red		= { 220,  50,  47 };
 static SDL_Color blue		= {  38, 139, 210 };
 static SDL_Color cyan		= {  42, 161, 152 };
 static SDL_Color green		= { 133, 153, 	0 };
