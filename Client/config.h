@@ -1,13 +1,27 @@
 #ifndef _CONFIG_H_
 #define _CONFIG_H_
 
+// Common includes
 #include <SDL2/SDL.h>
+
+// std's
+#include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Networking based
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include "tokens.h"
+
+#define BUFFER_SIZE 1024
 
 // Networking settings
 #define PORT 8080
 static char* ip = "127.0.0.1";
 
-static int server = 0;
+static int server;
 
 // Colors
 static SDL_Color main_bg 	= {   0,  43,  54 };
@@ -22,6 +36,7 @@ static SDL_Color gray		= {  88, 110, 117 };
 // UI stuff
 //static char* font_path = "/usr/share/fonts/TTF/Terminess (TTF) Nerd Font Complete.ttf";
 static char* font_path = "Client/assets/Terminess (TTF) Nerd Font Complete Mono.ttf";
-static int font_size = 25;
+//static char* font_path = "Client/assets/JetBrainsMonoNL-Regular.ttf";
+static int font_size = 23;
 
 #endif

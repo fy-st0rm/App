@@ -10,9 +10,10 @@ typedef struct HomePage
 	Window* window;
 	TTF_Font* font;
 	SDL_Event event;
-
+	
+	int server;
 	bool loop;
-	char* page;
+	int page;
 
 	// Textures
 	SDL_Texture* login_texture;
@@ -40,7 +41,7 @@ typedef struct HomePage
 	SDL_Rect mode_button_rect;
 } HomePage;
 
-HomePage* home_page_new(Window* window, TTF_Font* font);
+HomePage* home_page_new(Window* window, TTF_Font* font, int server);
 void home_page_run				(HomePage* home_page);
 void home_page_close			(HomePage* home_page);
 void home_page_resize_widgets	(HomePage* home_page);

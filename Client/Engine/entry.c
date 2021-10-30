@@ -209,9 +209,7 @@ void entry_mouse_event(Entry* entry, SDL_Event event, int offset_x, int offset_y
 
 char* entry_get(Entry* entry)
 {
-	if (entry->active)
-		return entry->input;
-	return "";
+	return entry->input;
 }
 
 void entry_clear(Entry* entry)

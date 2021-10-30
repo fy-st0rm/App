@@ -24,7 +24,7 @@ void window_clear(Window* window, SDL_Color color)
 	SDL_RenderClear(window->renderer);
 
 	// Drawing notifications
-	notify_draw(window->renderer);	
+	notify_draw(window);	
 }
 
 void window_destroy(Window* window)

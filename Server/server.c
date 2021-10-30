@@ -1,25 +1,11 @@
-// Std's includes
-#include <stdio.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include <pthread.h>
-
-// Socket includes
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include "leak_detector_c.h"
-#define PORT 8080
-
-// Global vars
-static int server_fd;
-static struct sockaddr_in address;
-static int opt = 1;
+#include "globals.h"
 
 
 int create_server();
 void handle_client(int conn);
+char* handle_login(int conn);
+
+void send_status(int conn, int status);
 
 int create_server()
 {
@@ -50,26 +36,82 @@ int create_server()
 	return 0;
 }
 
+void send_status(int conn, int status)
+{
+	char msg[1];
+	sprintf(msg, "%d", status);
+	sleep(DELAY);
+	send(conn, msg, sizeof(msg), 0);
+}
+
+char* handle_login(int conn)
+{
+	char buffer[BUFFER_SIZE] = {0};
+	bool loop = true;
+	while (loop)
+	{
+		int val;
+		if ((val = read(conn, buffer, sizeof(buffer))) > 0)
+		{
+			char* token = strtok(buffer, " ");
+			char* username = strtok(NULL, " ");
+			char* password = strtok(NULL, " ");
+			
+			if (atoi(token) == LOGIN)		// When data is from login
+			{
+				if (dict_exists(clients_list, username))
+					if (strcmp(dict_get(clients_list, username), password) == 0)
+					{
+						send_status(conn, PASS);
+						loop = false;
+						return username;
+					}
+				send_status(conn, FAIL);
+			}
+			else if (atoi(token) == SIGNUP)	// When data is from singup
+			{
+				if (!dict_exists(clients_list, username))
+				{
+					dict_append(clients_list, username, password);
+					save_clients_info();
+
+					loop = false;
+					return username;
+				}
+				send_status(conn, FAIL);
+			}
+			else if (atoi(token) == DISCONNECT)
+				return "";
+		}
+	}
+}
+
 void handle_client(int conn)
 {
-	char* welcome = "Connected!\n";
-	char buffer[1024] = {0};
-
-	send(conn, welcome, strlen(welcome), 0); 
-	while (1)
+	char buffer[BUFFER_SIZE] = {0};
+	char* username = malloc(sizeof(char) * 100);
+	strcpy(username, handle_login(conn));
+	
+	if (strlen(username) > 0)
 	{
-		int val = read(conn, buffer, sizeof(buffer));
-		printf("Client %d: %d %s\n", conn, val, buffer);
-		break;
+		printf("Connected: %s\n", username);
 	}
+	
+	printf("Disconnected: %d\n", conn);
+	close(conn);	
+	//free(username);
 }
 
 int main(int argc, char** argv)
 {
-	printf("SERVER: %d\n", server_fd);
 	if (create_server() < 0)
 		return -1;
+	
+	// Loading clients data
+	load_clients_info();
 
+	printf("Server started...\n");
+	
 	pthread_t thread;
 	int conn;
 	int addrlen = sizeof(address);
@@ -77,7 +119,7 @@ int main(int argc, char** argv)
 	while (1)
 	{
 		// Listening for the clients
-		listen(server_fd, 1);
+		listen(server_fd, 0);
 
 		if ((conn = accept(server_fd, (struct sockaddr*) &address, (socklen_t*) &addrlen)) < 0)
 			fprintf(stderr, "Accept error!");

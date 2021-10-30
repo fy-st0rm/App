@@ -56,16 +56,18 @@ void notify_send(Window* window, TTF_Font* font, char* text, int time, SDL_Color
 	notify_add(notify);
 }
 
-void notify_draw(SDL_Renderer* renderer)
+void notify_draw(Window* window)
 {
 	for (int i = 0; i < notifications_len; i++)
 	{
 		Notify* notify = notifications[i];
-		SDL_SetRenderDrawColor(renderer, notify->bg.r, notify->bg.g, notify->bg.b, notify->bg.a);
+		SDL_SetRenderDrawColor(window->renderer, notify->bg.r, notify->bg.g, notify->bg.b, notify->bg.a);
+		
+		notify->rect.x = window->w - (notify->rect.w + 10);
 		SDL_Rect temp = { notify->rect.x - 5, notify->rect.y, notify->rect.w + 5, notify->rect.h + 5 };
-		SDL_RenderFillRect(renderer, &temp);
+		SDL_RenderFillRect(window->renderer, &temp);
 
-		draw_text(renderer, notify->rect.x, notify->rect.y, notify->texture, notify->fg);
+		draw_text(window->renderer, notify->rect.x, notify->rect.y, notify->texture, notify->fg);
 		
 		// When the timer runs out destroy that notification	
 		Uint32 sec = (SDL_GetTicks() - notify->tick) / 1000;

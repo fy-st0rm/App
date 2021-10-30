@@ -5,7 +5,7 @@ INC = vendor/
 # Server
 S_DIR = Server
 S_SRC = $(S_DIR)/server.c $(INC)/*.c
-S_OBJ = $(S_DIR)/server.o
+S_OBJ = $(S_DIR)/*.o
 S_OUT = $(S_DIR)/server
 S_LIB = -lpthread
 

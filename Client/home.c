@@ -2,14 +2,15 @@
 #include "stdlib.h"
 
 
-HomePage* home_page_new(Window* window, TTF_Font* font)
+HomePage* home_page_new(Window* window, TTF_Font* font, int server)
 {
 	HomePage* home_page = malloc(sizeof(HomePage));
 	home_page->window = window;
 	home_page->font = font;
 
+	home_page->server = server;
 	home_page->loop = true;
-	home_page->page = "LOGIN";
+	home_page->page = LOGIN;
 	home_page->focus = 1;
 
 	// Creating textures
@@ -111,7 +112,18 @@ void home_page_run(HomePage* home_page)
 	Uint32 frame_start;
 	int frame_time;
 	
-	
+	/*	
+	//DATA SENDING SAMPLE
+
+	char* data = "Slok 123";
+	int size = strlen(data) + 3;
+	char msg[size];
+	sprintf(msg, "%d ", SIGNUP);
+	strcpy(msg+2, data);
+	printf("%s\n", msg);
+	send(home_page->server, msg, strlen(msg), 0);
+	*/
+
 	while (home_page->loop)
 	{
 		frame_start = SDL_GetTicks();
@@ -146,18 +158,18 @@ void home_page_run(HomePage* home_page)
 			// Buttons to change the mode type of the page
 			if (button_is_clicked(home_page->mode_button, home_page->event, home_page->menu_rect.x, home_page->menu_rect.y))
 			{
-				if (home_page->page == "LOGIN")
+				if (home_page->page == LOGIN)
 				{
-					home_page->page = "SIGNUP";
+					home_page->page = SIGNUP;
 					button_change_text(home_page->mode_button, home_page->window->renderer, home_page->font, "<Login>");
 
 					entry_clear(home_page->username_entry);
 					entry_clear(home_page->password_entry);
 					entry_set_focus(home_page->username_entry);
 				}
-				else if (home_page->page == "SIGNUP")
+				else if (home_page->page == SIGNUP)
 				{
-					home_page->page = "LOGIN";
+					home_page->page = LOGIN;
 					button_change_text(home_page->mode_button, home_page->window->renderer, home_page->font, "<Signup>");
 					
 					entry_clear(home_page->username_entry);
@@ -169,14 +181,44 @@ void home_page_run(HomePage* home_page)
 			// Button event to create or login in account
 			if (button_is_clicked(home_page->create_button, home_page->event, home_page->menu_rect.x, home_page->menu_rect.y))
 			{
-				if (home_page->page == "LOGIN")
+				char* username = entry_get(home_page->username_entry);
+				char* password = entry_get(home_page->password_entry);
+				
+				if ((strlen(username) > 0) && (strlen(password) > 0))
 				{
-					notify_send(home_page->window, home_page->font, "Account not found!", 5, main_fg, red);
+					if (home_page->page == LOGIN)
+					{
+						// Sending the collected username and password
+						int size = strlen(username) + strlen(password) + 3;
+						char data[size];
+						sprintf(data, "%d %s %s", LOGIN, username, password);	
+						send(home_page->server, data, sizeof(data), 0);
+						
+						// Waiting to check if the content was valid
+						char buffer[BUFFER_SIZE] = {0};
+						read(home_page->server, buffer, sizeof(buffer));
+					
+						if (atoi(buffer) == FAIL)
+							notify_send(home_page->window, home_page->font, "Username or password didnt match!", 5, main_fg, red);
+					}
+					else if (home_page->page == SIGNUP)
+					{
+						// Sending the collected username and password
+						int size = strlen(username) + strlen(password) + 3;
+						char data[size];
+						sprintf(data, "%d %s %s", SIGNUP, username, password);	
+						send(home_page->server, data, sizeof(data), 0);
+						
+						// Waiting to check if the content was valid
+						char buffer[BUFFER_SIZE] = {0};
+						read(home_page->server, buffer, sizeof(buffer));
+					
+						if (atoi(buffer) == FAIL)
+							notify_send(home_page->window, home_page->font, "Account already exists!", 5, main_fg, red);
+					}
 				}
 				else
-				{
-					notify_send(home_page->window, home_page->font, "Account created!", 5, main_fg, green);
-				}
+					notify_send(home_page->window, home_page->font, "Empty entry found!", 5, main_fg, red);
 			}
 			
 		}
@@ -187,9 +229,9 @@ void home_page_run(HomePage* home_page)
 		// Rendering process
 		menu_render_begin(home_page->menu, home_page->window->renderer);
 
-		if (home_page->page == "LOGIN")
+		if (home_page->page == LOGIN)
 			draw_text(home_page->window->renderer, 5, 5, home_page->login_texture, green); 
-		else if (home_page->page == "SIGNUP")
+		else if (home_page->page == SIGNUP)
 			draw_text(home_page->window->renderer, 5, 5, home_page->signup_texture, green); 
 		
 		// Rendering widgets
