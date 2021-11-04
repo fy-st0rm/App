@@ -1,2 +1,0 @@
-slok 123
-slok_pradhan 123

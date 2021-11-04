@@ -104,7 +104,7 @@ void home_page_password(HomePage* home_page)
 	entry_render(home_page->password_entry, home_page->window->renderer, home_page->menu->texture, home_page->font);
 }
 
-void home_page_run(HomePage* home_page)
+bool home_page_run(HomePage* home_page)
 {
 	// Frame stuff
 	int fps = 75;
@@ -132,7 +132,12 @@ void home_page_run(HomePage* home_page)
 		// Event loop
 		if (SDL_PollEvent(&home_page->event))
 		{
-			if (home_page->event.type == SDL_QUIT) home_page->loop = false;
+			if (home_page->event.type == SDL_QUIT)
+			{
+				home_page->loop = false;
+				return false;
+			}
+
 			else if (home_page->event.type == SDL_WINDOWEVENT)
 			{
 				switch (home_page->event.window.event)
@@ -200,6 +205,11 @@ void home_page_run(HomePage* home_page)
 					
 						if (atoi(buffer) == FAIL)
 							notify_send(home_page->window, home_page->font, "Username or password didnt match!", 5, main_fg, red);
+						else
+						{
+							home_page->loop = false;
+							return true;
+						}
 					}
 					else if (home_page->page == SIGNUP)
 					{
@@ -215,6 +225,11 @@ void home_page_run(HomePage* home_page)
 					
 						if (atoi(buffer) == FAIL)
 							notify_send(home_page->window, home_page->font, "Account already exists!", 5, main_fg, red);
+						else
+						{
+							home_page->loop = false;
+							return true;
+						}
 					}
 				}
 				else

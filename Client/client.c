@@ -1,6 +1,7 @@
 #include "config.h"
 #include "Engine/engine.h"
 #include "home.h"
+#include "app.h"
 
 int connect_sv();
 
@@ -42,13 +43,21 @@ int main(int argc, char** argv)
 
 	// Starting home page
 	HomePage* home_page = home_page_new(window, font, server);
-	home_page_run(home_page);
+	bool passed = home_page_run(home_page);
 	home_page_close(home_page);
 	
+	if (passed)
+	{	
+		// Starting the app
+		App* app = app_new(window, font, server);
+		printf("Running app!\n");
+		app_run(app);
+		app_close(app);
+	}
+
 	// Sending disconnect msg when quiting the app
 	char msg[10] = {0};
 	sprintf(msg, "%d %s %s", DISCONNECT, "a", "b");
-	printf("%s\n", msg);
 	send(server, msg, strlen(msg), 0);
 
 	window_destroy(window);

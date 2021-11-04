@@ -74,7 +74,8 @@ char* handle_login(int conn)
 				{
 					dict_append(clients_list, username, password);
 					save_clients_info();
-
+					
+					send_status(conn, PASS);
 					loop = false;
 					return username;
 				}
@@ -92,10 +93,14 @@ void handle_client(int conn)
 	char* username = malloc(sizeof(char) * 100);
 	strcpy(username, handle_login(conn));
 	
+	bool connected;	
 	if (strlen(username) > 0)
 	{
+		connected = true;
 		printf("Connected: %s\n", username);
 	}
+	
+	// TODO: create a infinite lister to the client
 	
 	printf("Disconnected: %d\n", conn);
 	close(conn);	

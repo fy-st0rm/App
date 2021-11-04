@@ -42,7 +42,7 @@ typedef struct HomePage
 } HomePage;
 
 HomePage* home_page_new(Window* window, TTF_Font* font, int server);
-void home_page_run				(HomePage* home_page);
+bool home_page_run				(HomePage* home_page);
 void home_page_close			(HomePage* home_page);
 void home_page_resize_widgets	(HomePage* home_page);
 void home_page_update_widgets	(HomePage* home_page);

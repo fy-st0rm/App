@@ -1,6 +1,6 @@
 CC = gcc
 
-INC = vendor/
+INC = global/
 
 # Server
 S_DIR = Server

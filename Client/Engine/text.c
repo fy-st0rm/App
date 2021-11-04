@@ -11,6 +11,15 @@ SDL_Texture* create_texture(SDL_Renderer* renderer, TTF_Font* font, char* text)
 	return texture;
 }
 
+SDL_Texture* create_texture_wrapped(SDL_Renderer* renderer, TTF_Font* font, char* text, int length)
+{
+	SDL_Color white = {255, 255, 255, 255};
+	SDL_Surface* surface = TTF_RenderText_Blended_Wrapped(font, text, white, length);
+	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
+	SDL_FreeSurface(surface);
+	return texture;
+}
+
 void draw_text(SDL_Renderer* renderer, int x, int y, SDL_Texture* texture, SDL_Color color)
 {
 	// Renders the texture onto the screen
