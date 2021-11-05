@@ -1,5 +1,5 @@
 CC = gcc
-INC = ../../vendor/
+INC = ../../global/
 LIB = -lSDL2main -lSDL2 -lSDL2_ttf
 
 SRC = *.c $(INC)*.c

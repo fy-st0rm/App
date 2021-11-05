@@ -8,6 +8,29 @@ Button* button_new(SDL_Renderer* renderer, SDL_Rect rect, TTF_Font* font, char* 
 
 	button->rect = rect;
 	button->text_texture = create_texture(renderer, font, text);
+	
+	// Checking if the text is wider than the button
+	SDL_Rect text_rect;
+	SDL_QueryTexture(button->text_texture, NULL, NULL, &text_rect.w, NULL);
+
+	// If yes
+	if (text_rect.w > rect.w)
+	{
+		SDL_Texture* char_texture = create_texture(renderer, font, "A");
+		int char_w;
+		SDL_QueryTexture(char_texture, NULL, NULL, &char_w, NULL);
+
+		// Calculating no of characters that can be fitted in the button
+		int no_of_char = rect.w / char_w;
+		char new_text[no_of_char];
+		memcpy(new_text, text, no_of_char);
+
+		SDL_DestroyTexture(char_texture);
+		SDL_DestroyTexture(button->text_texture);
+		
+		// Regenrating the new texture
+		button->text_texture = create_texture(renderer, font, new_text);
+	}
 
 	button->fg = fg;
 	button->bg = bg;

@@ -24,7 +24,7 @@ int main(int argc, char** argv)
 	SDL_Color b_fg = { 255, 255, 255, 255 };
 	SDL_Color b_bg = { 0, 0, 0, 255 };
 	SDL_Color b_b = { 165, 165, 0, 255 };
-	Button* button = button_new(window->renderer, b_pos, font, "Click me!", b_fg, b_bg, b_b);
+	Button* button = button_new(window->renderer, b_pos, font, "Click me! ABCDEFkdkjfklajsdklfja", b_fg, b_bg, b_b);
 	
 	// Menu
 	SDL_Rect m_pos = { 100, 200, 500, 500 };
