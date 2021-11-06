@@ -7,6 +7,9 @@ Button* button_new(SDL_Renderer* renderer, SDL_Rect rect, TTF_Font* font, char* 
 	Button* button = malloc(sizeof(Button));
 
 	button->rect = rect;
+
+	button->text = calloc(sizeof(text), sizeof(char));
+	strcpy(button->text, text);
 	button->text_texture = create_texture(renderer, font, text);
 	
 	// Checking if the text is wider than the button
@@ -47,7 +50,6 @@ void button_destroy(Button* button)
 
 void button_render(Button* button, SDL_Renderer* renderer)
 {
-
 	// Drawing border
 	SDL_Rect border_rect = { button->rect.x - 2, button->rect.y - 2, button->rect.w + 4, button->rect.h + 4};
 	SDL_SetRenderDrawColor(renderer, button->border.r, button->border.g, button->border.b, button->border.a);
@@ -100,4 +102,34 @@ void button_change_text(Button* button, SDL_Renderer* renderer, TTF_Font* font, 
 {
 	SDL_DestroyTexture(button->text_texture);
 	button->text_texture = create_texture(renderer, font, text);
+}
+
+void button_change_rect(Button* button, SDL_Renderer* renderer, TTF_Font* font, SDL_Rect rect)
+{
+	if ((button->rect.x != rect.x) || (button->rect.y != rect.y) || (button->rect.w != rect.w) || (button->rect.h != rect.h))
+	{
+		button->rect = rect;	
+		
+		// Checking if the text is wider than the button
+		SDL_Rect text_rect;
+		SDL_QueryTexture(button->text_texture, NULL, NULL, &text_rect.w, NULL);
+
+		// If yes
+		if (text_rect.w > rect.w)
+		{
+			SDL_Texture* char_texture = create_texture(renderer, font, "A");
+			int char_w;
+			SDL_QueryTexture(char_texture, NULL, NULL, &char_w, NULL);
+
+			// Calculating no of characters that can be fitted in the button
+			int no_of_char = rect.w / char_w;
+			char new_text[no_of_char];
+			memcpy(new_text, button->text, no_of_char);
+
+			SDL_DestroyTexture(char_texture);
+			SDL_DestroyTexture(button->text_texture);
+			// Regenrating the new texture
+			button->text_texture = create_texture(renderer, font, new_text);
+		}
+	}
 }

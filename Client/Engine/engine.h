@@ -11,6 +11,7 @@
 #include "button.h"
 #include "notify.h"
 #include "search.h"
+#include "listbox.h"
 #include "leak_detector_c.h"
 
 static int engine_init()

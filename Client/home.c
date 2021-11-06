@@ -112,7 +112,7 @@ bool home_page_run(HomePage* home_page)
 	Uint32 frame_start;
 	int frame_time;
 	
-	/*	
+	/*
 	//DATA SENDING SAMPLE
 
 	char* data = "Slok 123";
