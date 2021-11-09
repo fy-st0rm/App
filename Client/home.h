@@ -48,5 +48,6 @@ void home_page_resize_widgets	(HomePage* home_page);
 void home_page_update_widgets	(HomePage* home_page);
 void home_page_username			(HomePage* home_page);
 void home_page_password			(HomePage* home_page);
+bool home_page_handle_login		(HomePage* home_page);
 
 #endif

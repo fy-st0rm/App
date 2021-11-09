@@ -10,7 +10,7 @@ Button* button_new(SDL_Renderer* renderer, SDL_Rect rect, TTF_Font* font, char* 
 
 	button->text = calloc(sizeof(text), sizeof(char));
 	strcpy(button->text, text);
-	button->text_texture = create_texture(renderer, font, text);
+	button->text_texture = create_texture(renderer, font, button->text);
 	
 	// Checking if the text is wider than the button
 	SDL_Rect text_rect;
@@ -37,6 +37,7 @@ Button* button_new(SDL_Renderer* renderer, SDL_Rect rect, TTF_Font* font, char* 
 
 	button->fg = fg;
 	button->bg = bg;
+	button->backup_bg = bg;
 	button->border = border;
 	button->active = false;
 
@@ -45,6 +46,8 @@ Button* button_new(SDL_Renderer* renderer, SDL_Rect rect, TTF_Font* font, char* 
 
 void button_destroy(Button* button)
 {
+	SDL_DestroyTexture(button->text_texture);
+	free(button->text);
 	free(button);
 }
 
@@ -98,6 +101,12 @@ void button_change_fg(Button* button, SDL_Color fg)
 		button->fg = fg;
 }
 
+void button_change_bg(Button* button, SDL_Color bg)
+{
+	if ((button->bg.r != bg.r) && (button->bg.g != bg.g) && (button->bg.b != bg.b))
+		button->bg = bg;
+}
+
 void button_change_text(Button* button, SDL_Renderer* renderer, TTF_Font* font, char* text)
 {
 	SDL_DestroyTexture(button->text_texture);
@@ -113,7 +122,7 @@ void button_change_rect(Button* button, SDL_Renderer* renderer, TTF_Font* font, 
 		// Checking if the text is wider than the button
 		SDL_Rect text_rect;
 		SDL_QueryTexture(button->text_texture, NULL, NULL, &text_rect.w, NULL);
-
+		
 		// If yes
 		if (text_rect.w > rect.w)
 		{
@@ -129,7 +138,13 @@ void button_change_rect(Button* button, SDL_Renderer* renderer, TTF_Font* font, 
 			SDL_DestroyTexture(char_texture);
 			SDL_DestroyTexture(button->text_texture);
 			// Regenrating the new texture
+			
 			button->text_texture = create_texture(renderer, font, new_text);
+		}
+		else
+		{
+			SDL_DestroyTexture(button->text_texture);
+			button->text_texture = create_texture(renderer, font, button->text);
 		}
 	}
 }

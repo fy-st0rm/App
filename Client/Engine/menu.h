@@ -18,6 +18,8 @@ Menu* menu_new(SDL_Renderer* renderer, SDL_Rect rect, SDL_Color bg, SDL_Color bo
 void menu_destroy(Menu* menu);
 void menu_render_begin(Menu* menu, SDL_Renderer* renderer);
 void menu_render_end(Menu* menu, SDL_Renderer* renderer);
-void menu_update_rect(Menu* menu, SDL_Rect rect);
+void menu_change_rect(Menu* menu, SDL_Renderer* renderer, SDL_Rect rect);
+void menu_change_bg(Menu* menu, SDL_Color bg);
+void menu_change_border(Menu* menu, SDL_Color border);
 
 #endif

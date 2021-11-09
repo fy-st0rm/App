@@ -27,10 +27,10 @@ static char* ip = "127.0.0.1";
 static int server;
 
 // Help
-static char* help = "          Welcome to ****          \n"
-					"  Ctrl+l  : Open's servers list.   \n"
-					"  Ctrl+n  : To join new server.    \n"
-					"  Ctrl+h  : To go to home page.    ";
+static char* help = "          Welcome to ****           \n"
+					"  Ctrl+l  : To focus on server list.\n"
+					"  Ctrl+n  : To join new server.     \n"
+					"  Ctrl+h  : To go to home page.     ";
 
 // Colors
 static SDL_Color main_bg 	= {   0,  43,  54 };

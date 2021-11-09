@@ -15,6 +15,14 @@ typedef struct App
 	int server;
 	bool loop;
 	int page;
+
+	// Keys
+	bool lctrl;
+
+	// Widgets
+	ListBox* sv_listbox;
+	SDL_Rect sv_listbox_rect;
+
 } App;
 
 

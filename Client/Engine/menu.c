@@ -7,7 +7,7 @@ Menu* menu_new(SDL_Renderer* renderer, SDL_Rect rect, SDL_Color bg, SDL_Color bo
 	menu->rect = rect;
 	menu->bg = bg;
 	menu->border = border;
-
+	
 	menu->texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, rect.w, rect.h);
 	return menu;
 }
@@ -40,8 +40,22 @@ void menu_render_end(Menu* menu, SDL_Renderer* renderer)
 	SDL_RenderCopy(renderer, menu->texture, NULL, &menu->rect);
 }
 
-void menu_update_rect(Menu* menu, SDL_Rect rect)
+void menu_change_rect(Menu* menu, SDL_Renderer* renderer, SDL_Rect rect)
 {
-	menu->rect = rect;
+	if ((menu->rect.x != rect.x) || (menu->rect.y != rect.y) || (menu->rect.w != rect.w) || (menu->rect.h != rect.h))
+	{
+		menu->rect = rect;
+		SDL_DestroyTexture(menu->texture);
+		menu->texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, rect.w, rect.h);
+	}
 }
 
+void menu_change_bg(Menu* menu, SDL_Color bg)
+{
+	menu->bg = bg;
+}
+
+void menu_change_border(Menu* menu, SDL_Color border)
+{
+	menu->border = border;
+}

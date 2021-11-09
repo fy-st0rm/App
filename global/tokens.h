@@ -12,5 +12,6 @@
 #define LOGIN		2
 #define SIGNUP		3
 #define HOME		4
+#define SERVER_LIST 5
 
 #endif

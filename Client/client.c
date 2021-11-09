@@ -46,6 +46,7 @@ int main(int argc, char** argv)
 	bool passed = home_page_run(home_page);
 	home_page_close(home_page);
 	
+	printf("Started app!\n");
 	if (passed)
 	{	
 		// Starting the app

@@ -73,7 +73,7 @@ void home_page_resize_widgets(HomePage* home_page)
 	// Updating menu rect
 	home_page->menu_rect.x = home_page->window->w / 2 - home_page->menu_rect.w / 2;
 	home_page->menu_rect.y = home_page->window->h / 2 - home_page->menu_rect.h / 2;
-	menu_update_rect(home_page->menu, home_page->menu_rect);
+	menu_change_rect(home_page->menu, home_page->window->renderer, home_page->menu_rect);
 }
 
 void home_page_update_widgets(HomePage* home_page)
@@ -111,23 +111,10 @@ bool home_page_run(HomePage* home_page)
 	int frame_delay = 1000 / fps;
 	Uint32 frame_start;
 	int frame_time;
-	
-	/*
-	//DATA SENDING SAMPLE
-
-	char* data = "Slok 123";
-	int size = strlen(data) + 3;
-	char msg[size];
-	sprintf(msg, "%d ", SIGNUP);
-	strcpy(msg+2, data);
-	printf("%s\n", msg);
-	send(home_page->server, msg, strlen(msg), 0);
-	*/
 
 	while (home_page->loop)
 	{
 		frame_start = SDL_GetTicks();
-		window_clear(home_page->window, sec_bg);
 
 		// Event loop
 		if (SDL_PollEvent(&home_page->event))
@@ -137,7 +124,6 @@ bool home_page_run(HomePage* home_page)
 				home_page->loop = false;
 				return false;
 			}
-
 			else if (home_page->event.type == SDL_WINDOWEVENT)
 			{
 				switch (home_page->event.window.event)
@@ -148,6 +134,26 @@ bool home_page_run(HomePage* home_page)
 						SDL_GetWindowSize(home_page->window->window, &home_page->window->w, &home_page->window->h);
 						home_page_resize_widgets(home_page);
 						break;
+					}
+				}
+			}
+			else if (home_page->event.type == SDL_KEYDOWN)
+			{
+				switch (home_page->event.key.keysym.sym)
+				{
+					case SDLK_RETURN:
+					{
+						if (home_page->username_entry->active)
+						{
+							entry_remove_focus(home_page->username_entry);
+							entry_set_focus(home_page->password_entry);
+						}
+						else if (home_page->password_entry->active)
+						{
+							bool result = home_page_handle_login(home_page);
+							if (result) return result;
+						}
+						break;	
 					}
 				}
 			}
@@ -186,58 +192,13 @@ bool home_page_run(HomePage* home_page)
 			// Button event to create or login in account
 			if (button_is_clicked(home_page->create_button, home_page->event, home_page->menu_rect.x, home_page->menu_rect.y))
 			{
-				char* username = entry_get(home_page->username_entry);
-				char* password = entry_get(home_page->password_entry);
-				
-				if ((strlen(username) > 0) && (strlen(password) > 0))
-				{
-					if (home_page->page == LOGIN)
-					{
-						// Sending the collected username and password
-						int size = strlen(username) + strlen(password) + 3;
-						char data[size];
-						sprintf(data, "%d %s %s", LOGIN, username, password);	
-						send(home_page->server, data, sizeof(data), 0);
-						
-						// Waiting to check if the content was valid
-						char buffer[BUFFER_SIZE] = {0};
-						read(home_page->server, buffer, sizeof(buffer));
-					
-						if (atoi(buffer) == FAIL)
-							notify_send(home_page->window, home_page->font, "Username or password didnt match!", 5, main_fg, red);
-						else
-						{
-							home_page->loop = false;
-							return true;
-						}
-					}
-					else if (home_page->page == SIGNUP)
-					{
-						// Sending the collected username and password
-						int size = strlen(username) + strlen(password) + 3;
-						char data[size];
-						sprintf(data, "%d %s %s", SIGNUP, username, password);	
-						send(home_page->server, data, sizeof(data), 0);
-						
-						// Waiting to check if the content was valid
-						char buffer[BUFFER_SIZE] = {0};
-						read(home_page->server, buffer, sizeof(buffer));
-					
-						if (atoi(buffer) == FAIL)
-							notify_send(home_page->window, home_page->font, "Account already exists!", 5, main_fg, red);
-						else
-						{
-							home_page->loop = false;
-							return true;
-						}
-					}
-				}
-				else
-					notify_send(home_page->window, home_page->font, "Empty entry found!", 5, main_fg, red);
+				bool result =  home_page_handle_login(home_page);
+				if (result)
+					return result;
 			}
-			
 		}
-		
+
+		window_clear(home_page->window, sec_bg);
 		// Updating buttons
 		home_page_update_widgets(home_page);
 
@@ -257,7 +218,7 @@ bool home_page_run(HomePage* home_page)
 		button_render(home_page->mode_button, home_page->window->renderer);
 		
 		menu_render_end(home_page->menu, home_page->window->renderer);
-
+		
 		// capping the frame rate to 60
 		frame_time = SDL_GetTicks() - frame_start;
 		if (frame_delay > frame_time)
@@ -265,6 +226,60 @@ bool home_page_run(HomePage* home_page)
 			SDL_Delay(frame_delay - frame_time);		
 		}
 	}
+}
+
+bool home_page_handle_login(HomePage* home_page)
+{
+	char* username = entry_get(home_page->username_entry);
+	char* password = entry_get(home_page->password_entry);
+
+	if ((strlen(username) > 0) && (strlen(password) > 0))
+	{
+		if (home_page->page == LOGIN)
+		{
+			// Sending the collected username and password
+			int size = strlen(username) + strlen(password) + 3;
+			char data[size];
+			sprintf(data, "%d %s %s", LOGIN, username, password);	
+			send(home_page->server, data, sizeof(data), 0);
+			
+			// Waiting to check if the content was valid
+			char buffer[BUFFER_SIZE] = {0};
+			read(home_page->server, buffer, sizeof(buffer));
+		
+			if (atoi(buffer) == FAIL)
+				notify_send(home_page->window, home_page->font, "Username or password didnt match!", 5, main_fg, red);
+			else
+			{
+				home_page->loop = false;
+				return true;
+			}
+		}
+		else if (home_page->page == SIGNUP)
+		{
+			// Sending the collected username and password
+			int size = strlen(username) + strlen(password) + 3;
+			char data[size];
+			sprintf(data, "%d %s %s", SIGNUP, username, password);	
+			send(home_page->server, data, sizeof(data), 0);
+			
+			// Waiting to check if the content was valid
+			char buffer[BUFFER_SIZE] = {0};
+			read(home_page->server, buffer, sizeof(buffer));
+		
+			if (atoi(buffer) == FAIL)
+				notify_send(home_page->window, home_page->font, "Account already exists!", 5, main_fg, red);
+			else
+			{
+				home_page->loop = false;
+				return true;
+			}
+		}
+	}
+	else
+		notify_send(home_page->window, home_page->font, "Empty entry found!", 5, main_fg, red);
+
+	return false;
 }
 
 void home_page_close(HomePage* home_page)
@@ -276,10 +291,12 @@ void home_page_close(HomePage* home_page)
 	SDL_DestroyTexture(home_page->password_texture);
 
 	// Destroying widgets
-	entry_destroy(home_page->username_entry);
+	//entry_destroy(home_page->username_entry);
 	entry_destroy(home_page->password_entry);
 	button_destroy(home_page->create_button);
 	button_destroy(home_page->mode_button);
-
-	free(home_page);
+	menu_destroy(home_page->menu);
+	
+	//free(home_page);
 }
+
