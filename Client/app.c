@@ -13,35 +13,12 @@ App* app_new(Window* window, TTF_Font* font, int server)
 
 	// Initializing keys
 	app->lctrl = false;
+
+	// Initializing widgets
+	SDL_Rect temp_search_rect = { 100, 100, 400, 400 };
+	app->search_box_rect = temp_search_rect;
+	app->search_box = search_box_new(window->renderer, app->search_box_rect, font, main_fg, main_bg, gray); 
 	
-	// Loading the help text
-	char temp[strlen(help)];
-	strcpy(temp, help);
-	char* first_line = strtok(temp, "\n");
-
-	int width;
-	SDL_Texture* temp_texture = create_texture(window->renderer, font, first_line);
-	SDL_QueryTexture(temp_texture, NULL, NULL, &width, NULL);
-	SDL_DestroyTexture(temp_texture);
-	app->help = create_texture_wrapped(window->renderer, font, help, width);
-
-	// Loading widgets
-	
-	// Server listbox
-	SDL_Rect sv_listbox_rect = { 0, 0, 100, window->h};
-	app->sv_listbox_rect = sv_listbox_rect;
-	app->sv_listbox = listbox_new(window->renderer, sv_listbox_rect, main_bg, main_bg);
-
-	// Test buttons
-	SDL_Rect test_rect = { 0, 0, 0, 0 };
-	for (int i = 0; i < 20; i++)
-	{
-		char text[5];
-		sprintf(text, "%d", i);
-		Button* server = button_new(window->renderer, test_rect, font, text, main_fg, main_bg, green);
-		listbox_append(app->sv_listbox, server);
-	}
-
 	return app;
 }
 
@@ -71,70 +48,12 @@ void app_run(App* app)
 						break;
 				}
 			}
-			else if (app->event.type == SDL_KEYDOWN)
-			{
-				switch(app->event.key.keysym.sym)
-				{
-					case SDLK_LCTRL:
-						app->lctrl = true;
-						break;
 
-					case SDLK_h:
-						if (app->lctrl)
-							app->page = HOME;
-						break;
-
-					case SDLK_l:
-						if (app->lctrl)
-							app->page = SERVER_LIST;
-						break;
-				}
-			}
-			else if (app->event.type == SDL_KEYUP)
-			{
-				switch(app->event.key.keysym.sym)
-				{
-					case SDLK_LCTRL:
-						app->lctrl = false;
-						break;
-				}
-			}
-			else if (app->event.type == SDL_MOUSEMOTION)
-			{
-				// This handles the activation of server list control via mouse
-				SDL_Point point;
-				SDL_GetMouseState(&point.x, &point.y);
-
-				if (SDL_PointInRect(&point, &app->sv_listbox->rect))
-					app->page = SERVER_LIST;
-				else
-					app->page = HOME;
-			}
-
-			// Giving widgets event handlers
-			if (app->page == SERVER_LIST)
-			{
-				listbox_change_border(app->sv_listbox, green);
-				listbox_event(app->sv_listbox, app->event);
-			}
-			else
-				listbox_change_border(app->sv_listbox, main_bg);
+			search_box_event(app->search_box, app->event);
 		}
+
+		search_box_render(app->search_box, app->window->renderer, app->font);
 		
-
-		// Rendering here	
-
-		// Drawing the help
-		SDL_Rect rect;
-		SDL_QueryTexture(app->help, NULL, NULL, &rect.w, &rect.h);
-		draw_text(app->window->renderer, app->window->w / 2 - rect.w / 2, app->window->h / 2 - rect.h / 2, app->help, main_fg);
-
-
-		SDL_Rect sv_listbox_rect = { 0, 0, 100, app->window->h };
-		listbox_change_rect(app->sv_listbox, app->window->renderer, sv_listbox_rect);
-		listbox_render(app->sv_listbox, app->window->renderer, app->font);
-
-
 		// capping the frame rate to 60
 		frame_time = SDL_GetTicks() - frame_start;
 		if (frame_delay > frame_time)
@@ -146,5 +65,6 @@ void app_run(App* app)
 
 void app_close(App* app)
 {
+	search_box_destroy(app->search_box);
 	free(app);
 }

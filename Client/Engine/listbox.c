@@ -22,6 +22,7 @@ ListBox* listbox_new(SDL_Renderer* renderer, SDL_Rect rect, SDL_Color bg, SDL_Co
 	listbox->speed = 50;
 	
 	// Selection thingy
+	listbox->active = false;
 	listbox->selected = 0;
 	listbox->focused = 0;
 
@@ -45,8 +46,9 @@ void listbox_render(ListBox* listbox, SDL_Renderer* renderer, TTF_Font* font)
 
 	for (int i = 0; i < listbox->len; i++)
 	{
-		SDL_Rect rect = { 0, (i * 50) + listbox->scroll_y, listbox->rect.w, 50 };	
-		listbox->scroll_end = (i * 50) + listbox->scroll_y;
+		int height = listbox->buttons[i]->rect.h;
+		SDL_Rect rect = { 0, (i * height) + listbox->scroll_y, listbox->rect.w, height };	
+		listbox->scroll_end = (i * height) + listbox->scroll_y;
 		
 		if  (((rect.y + rect.h) > 0) && (rect.y < listbox->rect.h))
 		{
@@ -87,6 +89,7 @@ void listbox_append(ListBox* listbox, Button* button)
 
 void listbox_event(ListBox* listbox, SDL_Event event)
 {
+	/*
 	if (event.type == SDL_MOUSEWHEEL)
 	{
 		if (event.wheel.y > 0)	// Scroll up
@@ -113,24 +116,42 @@ void listbox_event(ListBox* listbox, SDL_Event event)
 				listbox->focused = i;
 		}
 	}
-	else if (event.type == SDL_KEYDOWN)
+	*/
+	if (listbox->active)
 	{
-		switch (event.key.keysym.sym)
+		if (event.type == SDL_KEYDOWN)
 		{
-			//TODO: make it scroll
-			case SDLK_j:
-				if (listbox->focused < listbox->len - 1) 
-					listbox->focused += 1;
-				break;
-			
-			case SDLK_k:
-				if (listbox->focused > 0)
-					listbox->focused -= 1;
-				break;
+			switch (event.key.keysym.sym)
+			{
+				// Scroll down
+				case SDLK_j:
+				case SDLK_DOWN:
+					if (listbox->selected < listbox->len - 1) 
+					{
+						listbox->selected += 1;
+						if ((listbox->scroll_end > listbox->rect.h - 50) && 
+								(listbox->buttons[listbox->selected]->rect.y + listbox->buttons[listbox->selected]->rect.h + listbox->rect.y > listbox->rect.y + listbox->rect.h))
+							listbox->scroll_y -= listbox->speed;
+					}
+					break;
+				
+				// Scroll up
+				case SDLK_k:
+				case SDLK_UP:
+					if (listbox->selected > 0)
+					{
+						listbox->selected -= 1;
+						if ((listbox->scroll_y < listbox->scroll_start) && 
+								(listbox->buttons[listbox->selected]->rect.y + listbox->rect.y < listbox->rect.y))
+							listbox->scroll_y += listbox->speed;
+					}
+					break;
 
-			case SDLK_RETURN:
-				listbox->selected = listbox->focused;
-				break;
+				case SDLK_RETURN:
+					if (listbox->focused > 0)
+						listbox->selected = listbox->focused;
+					break;
+			}
 		}
 	}
 }

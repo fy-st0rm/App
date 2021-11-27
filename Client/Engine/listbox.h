@@ -13,6 +13,7 @@ typedef struct ListBox
 	int speed;
 	
 	// Selection thingy
+	bool active;
 	int selected;
 	int focused;
 	SDL_Color selected_color, focused_color;

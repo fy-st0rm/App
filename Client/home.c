@@ -291,12 +291,12 @@ void home_page_close(HomePage* home_page)
 	SDL_DestroyTexture(home_page->password_texture);
 
 	// Destroying widgets
-	//entry_destroy(home_page->username_entry);
+	entry_destroy(home_page->username_entry);
 	entry_destroy(home_page->password_entry);
 	button_destroy(home_page->create_button);
-	button_destroy(home_page->mode_button);
+	//button_destroy(home_page->mode_button);
 	menu_destroy(home_page->menu);
 	
-	//free(home_page);
+	free(home_page);
 }
 

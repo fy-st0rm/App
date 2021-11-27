@@ -23,6 +23,9 @@ typedef struct App
 	ListBox* sv_listbox;
 	SDL_Rect sv_listbox_rect;
 
+	SearchBox* search_box;
+	SDL_Rect search_box_rect;
+
 } App;
 
 

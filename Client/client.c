@@ -41,6 +41,8 @@ int main(int argc, char** argv)
 	TTF_Font* font = TTF_OpenFont(font_path, font_size);
 	if (!font) return -1;
 
+	printf("ID: %d %d\n", window->renderer, font);
+
 	// Starting home page
 	HomePage* home_page = home_page_new(window, font, server);
 	bool passed = home_page_run(home_page);
@@ -60,6 +62,7 @@ int main(int argc, char** argv)
 	char msg[10] = {0};
 	sprintf(msg, "%d %s %s", DISCONNECT, "a", "b");
 	send(server, msg, strlen(msg), 0);
+	printf("%s\n", msg);
 
 	window_destroy(window);
 	engine_quit();

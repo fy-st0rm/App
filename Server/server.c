@@ -1,6 +1,5 @@
 #include "globals.h"
 
-
 int create_server();
 void handle_client(int conn);
 char* handle_login(int conn);
@@ -59,17 +58,13 @@ char* handle_login(int conn)
 			char* token = strtok(buffer, " ");
 			char* username = strtok(NULL, " ");
 			char* password = strtok(NULL, " ");
-
-			printf("%s %s%s\n", token, password, username);
 			
 			if (atoi(token) == LOGIN)		// When data is from login
 			{
 				if (dict_exists(clients_list, username))
 				{
-					printf("Username exists!\n");
 					if (strcmp(dict_get(clients_list, username), password) == 0)
 					{
-						printf("Password found!\n");
 						send_status(conn, PASS);
 						loop = false;
 						return username;
@@ -100,8 +95,8 @@ void handle_client(int conn)
 {
 	char buffer[BUFFER_SIZE] = {0};
 	char* username = malloc(sizeof(char) * 100);
-	//strcpy(username, handle_login(conn));
-	handle_login(conn);
+	strcpy(username, handle_login(conn));
+	//handle_login(conn);
 
 	bool connected;	
 	if (strlen(username) > 0)
@@ -111,10 +106,24 @@ void handle_client(int conn)
 	}
 	
 	// TODO: create a infinite lister to the client
+	while (connected)
+	{
+		for (int i = 0; i < BUFFER_SIZE; i++) buffer[i] = '\0';
+		
+		int val;
+		if ((val = read(conn, buffer, sizeof(buffer))) > 0)
+		{
+			char* token = strtok(buffer, " ");
+			
+			// Parsing the token
+			if (atoi(token) == DISCONNECT)
+				connected = false;
+		}
+	}
 	
 	printf("Disconnected: %d\n", conn);
 	close(conn);	
-	//free(username);
+	free(username);
 }
 
 int main(int argc, char** argv)

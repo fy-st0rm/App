@@ -12,6 +12,7 @@
 #include "notify.h"
 #include "search.h"
 #include "listbox.h"
+#include "search.h"
 #include "leak_detector_c.h"
 
 static int engine_init()

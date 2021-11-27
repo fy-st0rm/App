@@ -10,6 +10,7 @@
 #include <string.h>
 #include <pthread.h>
 #include <stdbool.h>
+#include <sys/types.h>
 
 // Socket includes
 #include <sys/socket.h>

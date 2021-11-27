@@ -8,7 +8,9 @@ Menu* menu_new(SDL_Renderer* renderer, SDL_Rect rect, SDL_Color bg, SDL_Color bo
 	menu->bg = bg;
 	menu->border = border;
 	
+	printf("Creating texture! %d\n", renderer);
 	menu->texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, rect.w, rect.h);
+	printf("Creating texture!\n");	
 	return menu;
 }
 

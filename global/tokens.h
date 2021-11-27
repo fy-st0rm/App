@@ -14,4 +14,7 @@
 #define HOME		4
 #define SERVER_LIST 5
 
+// OPCodes
+#define CREATE_SV	6
+
 #endif
